@@ -1,22 +1,11 @@
-{
-  # bypass HTTP/3  
-  experimental_http3 off
-}
-
 fastapi-twilio.rockballsmedia.eu {
-  # tout le HTTP vers Uvicorn
-  reverse_proxy /* 127.0.0.1:5000
+  # TLS automatique
+  tls rockballsmedia@gmail.com
 
-  # WebSocket
-  @ws {
-    path /media-stream*
-  }
-  reverse_proxy @ws 127.0.0.1:5000 {
+  # Tout le HTTP/HTTPS + WS passe à Uvicorn
+  reverse_proxy * 127.0.0.1:5000 {
     transport http {
-      versions 1.1
+      versions 1.1 1.0
     }
   }
-
-  # TLS via Let’s Encrypt
-  tls rockballsmedia@gmail.com
 }

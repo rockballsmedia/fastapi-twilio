@@ -1,24 +1,34 @@
-# 1) Build Python
+# ─── Build de votre appli Python ──────────────────────────────────────────
 FROM python:3.12-slim AS builder
+
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-# 2) Final image avec Caddy et votre app
+# ─── Image finale ─────────────────────────────────────────────────────────
 FROM caddy:2.8-alpine
 
-# Copie de l'app Python
-COPY --from=builder /app /app
+# 1) Installer Python (pour Uvicorn) + venv
+RUN apk add --no-cache python3 py3-virtualenv
 
-# Copie de votre Caddyfile
+# 2) Créer un venv et y installer Uvicorn + dépendances
+RUN python3 -m venv /venv \
+    && /venv/bin/pip install --no-cache-dir uvicorn
+
+# 3) Copier votre code
+COPY --from=builder /app /app
+WORKDIR /app
+
+# 4) Copier le Caddyfile
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# Pour lancer à la fois Uvicorn et Caddy
+# Ports exposés par Caddy
+EXPOSE 80 443
+
+# 5) Entrypoint qui lance Uvicorn depuis le venv, puis Caddy
 COPY docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-# Exposez les ports 80 et 443
-EXPOSE 80 443
 
 ENTRYPOINT ["/entrypoint.sh"]
