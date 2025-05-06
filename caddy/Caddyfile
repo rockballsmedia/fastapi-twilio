@@ -1,28 +1,25 @@
 {
-    # Désactive HTTP/3 pour éviter H3_REQUEST_CANCELLED
-    experimental_http3 off
-    # Compression + suppression de l’en-tête Server
-    encode zstd gzip
-    header -Server
+  # Désactive HTTP/3
+  experimental_http3 off
+  encode zstd gzip
+  header -Server
 }
 
 fastapi-twilio.rockballsmedia.eu {
-    # Tout le HTTP → Uvicorn
-    reverse_proxy 127.0.0.1:5000
+  # HTTP classique
+  reverse_proxy 127.0.0.1:5000
+  
+  # WebSocket matcher
+  @ws {
+    path /media-stream /media-stream
+  }
+  reverse_proxy @ws 127.0.0.1:5000 {
+    transport http {
+      versions h2c 1.1
+    }
+  }
 
-    # WebSocket sur /media-stream*
-    @ws {
-        path /media-stream*
-    }
-    reverse_proxy @ws 127.0.0.1:5000 {
-        transport http {
-            versions 1.1
-        }
-    }
-
-    # TLS automatique
-    tls {
-        email rockballsmedia@gmail.com
-    }
+  tls {
+    email rockballsmedia@gmail.com
+  }
 }
-
