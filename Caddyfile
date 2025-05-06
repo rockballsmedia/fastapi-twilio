@@ -1,13 +1,23 @@
+# Désactive HTTP/3 (pour éviter les H3_REQUEST_CANCELLED)
 {
-  # Pas d’HTTP/3
   experimental_http3 off
-  encode zstd gzip
-  header -Server
 }
 
-:80, :443 {
-  tls rockballsmedia@gmail.com
+# Domaine principal
+fastapi-twilio.rockballsmedia.eu {
+  # Tout le trafic HTTP/HTTPS sur Uvicorn
+  reverse_proxy /* localhost:5000
 
-  # Proxy HTTP classique + WebSocket
-  reverse_proxy 127.0.0.1:5000
+  # WebSocket pour /media-stream
+  @ws {
+    path /media-stream*
+  }
+  reverse_proxy @ws localhost:5000 {
+    transport http {
+      versions 1.1
+    }
+  }
+
+  # Let's Encrypt automatique
+  tls rockballsmedia@gmail.com
 }
