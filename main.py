@@ -45,7 +45,7 @@ app = FastAPI()
 async def index_page():
     return HTMLResponse("<h1>✅ FastAPI Twilio↔OpenAI Realtime OK</h1>")
 
-@app..api_route("/incoming-call", methods=["GET", "POST"])
+@app.api_route("/incoming-call", methods=["GET", "POST"])
 async def handle_incoming_call(request: Request):
     """
     Webhook Twilio : renvoie le TwiML pour ouvrir le media-stream.
