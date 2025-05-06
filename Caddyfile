@@ -1,24 +1,30 @@
 {
+    # Désactive HTTP/3 (qu’il ne tente pas de négocier H3)
+    experimental_http3 off
+
+    # Compression et suppression du header Server
     encode zstd gzip
     header -Server
 }
 
 fastapi-twilio.rockballsmedia.eu {
-    # Proxy HTTP classique
+    # Proxy HTTP/HTTPS classiques
     reverse_proxy 127.0.0.1:5000
 
-    # Matcher pour WS media-stream
+    # Matcher pour WebSocket sur /media-stream*
     @media_stream {
         path /media-stream*
     }
     reverse_proxy @media_stream 127.0.0.1:5000 {
         transport http {
-            versions h2c 1.1
+            # Forcer HTTP/1.1 pour supporter l’Upgrade: websocket
+            versions 1.1
         }
     }
 
+    # TLS automatique via Let’s Encrypt
     tls {
-        email you@your.email
+        email you@votre.email
     }
 }
 
