@@ -1,0 +1,31 @@
+# Caddyfile à mettre à la racine de ton repo
+fastapi-twilio.rockballsmedia.eu {
+    # TLS géré automatiquement par Caddy
+    tls you@domain.tld
+
+    # Force HTTP/1.1 pour supporter le Upgrade
+    @ws {
+        header Connection *Upgrade*
+        header Upgrade websocket
+        path /media-stream*
+    }
+    reverse_proxy @ws 127.0.0.1:5000 {
+        transport http {
+            versions 1.1
+            keepalive 0
+        }
+    }
+
+    # Tout le reste passe aussi sur ton FastAPI
+    reverse_proxy 127.0.0.1:5000 {
+        transport http {
+            versions 1.1 2
+        }
+    }
+
+    # Santé de ton service
+    health_path /incoming-call
+    health_interval 30s
+    health_timeout 5s
+}
+
