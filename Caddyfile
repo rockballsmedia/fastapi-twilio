@@ -1,0 +1,23 @@
+{
+  # On désactive HTTP/3 pour éviter les H3_REQUEST_CANCELLED
+  experimental_http3 off
+  encode zstd gzip
+  header -Server
+}
+
+fastapi-twilio.rockballsmedia.eu {
+  # 1) WebSocket d’abord
+  @ws path /media-stream /media-stream/*
+  reverse_proxy @ws 127.0.0.1:5000 {
+    transport http {
+      versions h2c 1.1
+    }
+  }
+
+  # 2) Tout le reste
+  reverse_proxy 127.0.0.1:5000
+
+  tls {
+    email rockballsmedia@gmail.com
+  }
+}
