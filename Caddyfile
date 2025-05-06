@@ -1,23 +1,22 @@
-# Désactive HTTP/3 (pour éviter les H3_REQUEST_CANCELLED)
 {
+  # bypass HTTP/3  
   experimental_http3 off
 }
 
-# Domaine principal
 fastapi-twilio.rockballsmedia.eu {
-  # Tout le trafic HTTP/HTTPS sur Uvicorn
-  reverse_proxy /* localhost:5000
+  # tout le HTTP vers Uvicorn
+  reverse_proxy /* 127.0.0.1:5000
 
-  # WebSocket pour /media-stream
+  # WebSocket
   @ws {
     path /media-stream*
   }
-  reverse_proxy @ws localhost:5000 {
+  reverse_proxy @ws 127.0.0.1:5000 {
     transport http {
       versions 1.1
     }
   }
 
-  # Let's Encrypt automatique
+  # TLS via Let’s Encrypt
   tls rockballsmedia@gmail.com
 }
