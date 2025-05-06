@@ -1,0 +1,35 @@
+{
+  experimental_http3 off
+  encode zstd gzip
+  header   -Server
+}
+
+fastapi-twilio.rockballsmedia.eu {
+  tls rockballsmedia@gmail.com
+
+  reverse_proxy 127.0.0.1:5000
+
+  @ws {
+    path /media-stream*
+  }
+{
+  experimental_http3 off
+  encode zstd gzip
+  header   -Server
+}
+
+fastapi-twilio.rockballsmedia.eu {
+  tls rockballsmedia@gmail.com
+
+  reverse_proxy 127.0.0.1:5000
+
+  @ws {
+    path /media-stream*
+  }
+  reverse_proxy @ws 127.0.0.1:5000 {
+    transport http {
+      versions 1.1
+    }
+  }
+}
+
