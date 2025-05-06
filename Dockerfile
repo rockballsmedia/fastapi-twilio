@@ -1,26 +1,15 @@
-# Choix de l’image officielle Python légère
 FROM python:3.12-slim
 
-# Répertoire de travail dans le conteneur
-WORKDIR /app
+# Installer curl pour le healthcheck
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
 
-# Copie du code source dans le conteneur
+WORKDIR /app
 COPY . /app
 
-# Installation des dépendances
-RUN pip install --no-cache-dir \
-    fastapi \
-    uvicorn \
-    python-dotenv \
-    twilio \
-    openai \
-    websockets \
-    requests
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Exposition du port utilisé par Uvicorn
-ENV PORT=5000
 EXPOSE 5000
 
-# Commande de démarrage
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
-
